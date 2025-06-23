@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="DEMO BURGUER" />
+<meta property="og:description" content="Pide lo que más te gusta." />
+<meta property="og:image" content="https://res.cloudinary.com/du83rwgxa/image/upload/v1746649636/do%C3%B1a_2_dqbcok.jpg" />
+    <title>DEMO BURGUER</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="script.js" defer></script> <!-- Cargar el JavaScript que contiene la definición de los productos y su renderizado -->
+  <!-- Agrega estos enlaces en la sección <head> de tu HTML -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+</head>
+<body>
+    <!-- Menú superior -->
+    <nav class="top-menu">
+        <i data-feather="menu" class="menu-icon" onclick="toggleMenu()"></i>
+    </nav>
+
+<!-- Menú lateral de categorías -->
+<div id="side-menu" class="side-menu">
+    <button id="closeMenuButton" onclick="toggleMenu()">Cerrar Menú</button>
+
+    <div id="categoryList">
+        <!-- Las categorías se cargarán dinámicamente aquí -->
+    </div>
+</div>
+
+    <!-- Encabezado -->
+    <header>
+        <div class="header-background"></div>
+        <div class="header-content">
+            <img src="https://res.cloudinary.com/du83rwgxa/image/upload/v1746649636/do%C3%B1a_2_dqbcok.jpg" alt="Logo de McDonald's" class="logo">
+            <div class="restaurant-info">
+                <h1>BURGUER KING</h1>
+                <p>Pide lo que mas te gusta!</p>
+                <div class="info-row">
+                    <span class="info-item"><i data-feather="clock"></i> 10:00 AM - 10:00 PM </span>
+                    <span class="info-item"><i data-feather="map-pin"></i> NERONES CAMPO 4 CASAS HACIA AL SUR DE LA ESCUELA ABRAHAN MEJUA Z. </span>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+
+<div id="loader" class="loader-container">
+    <div class="loader"></div>
+    <p class="loader-text">Cargando Productos...</p>
+</div>
+
+
+
+    <!-- Contenedor de productos que se cargarán desde JavaScript -->
+    <main id="productContainer">
+        <!-- Los productos se insertarán aquí desde el JavaScript usando el array estático -->
+    </main>
+
+<!-- Modal del Producto -->
+<div id="modalProducto" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeProductModal()">&times;</span>
+        <h2 class="modal-title">Nombre del Producto</h2>
+        <p class="modal-description">Descripción del producto aquí.</p>
+
+        <!-- Sección de selección de tamaño -->
+        <div class="size-selection">
+            <label for="productSize">Selecciona un tamaño:</label>
+            <select id="productSize"></select>
+        </div>
+
+        <div class="quantity-controls">
+            <button class="quantity-minus" onclick="updateQuantity(-1)">-</button>
+            <input type="number" class="quantity-input" value="1" min="1">
+            <button class="quantity-plus" onclick="updateQuantity(1)">+</button>
+        </div>
+
+        <div class="extras-section">
+            <h3>Extras</h3>
+            <div class="extras-options">
+                <!-- Los extras se cargarán desde JavaScript al abrir el modal -->
+            </div>
+        </div>
+        <div class="comment-section">
+            <label for="productComment">Comentarios (opcional):</label>
+            <textarea id="productComment" placeholder="Añade tus comentarios como 'Poco queso' o 'Sin tomate'"></textarea>
+        </div>
+        <button class="modal-add-btn" onclick="addToCart()">Añadir L00.00</button>
+    </div>
+</div>
+
+
+    <!-- Modal del Carrito de Compras -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleCartModal()">&times;</span>
+            <h2 class="modal-title">Mi pedido</h2>
+            <div class="cart-items">
+                <!-- Los elementos del carrito se cargarán desde JavaScript -->
+            </div>
+            <div class="cart-total">
+                <span>Total Orden</span>
+                <span id="totalAmount">L0.00</span>
+            </div>
+
+            <div class="order-type">
+                <span>Tipo de pedido</span>
+                <select id="orderTypeSelect" onchange="toggleTableNumberField()">
+                    <option value="" selected disabled>Selecciona un tipo de pedido</option>
+                    <option value="llevar">Pasar Recogiendo</option>
+                    <option value="domicilio">A domicilio</option>
+                </select>
+            </div>
+            <div id="tableNumberContainer" class="table-number-container" style="display: none;">
+                <span>Número de mesa</span>
+                <input type="number" id="tableNumberInput" placeholder="Número de mesa" min="1">
+            </div>
+            <div class="order-name">
+                <span>Nombre del cliente</span>
+                <input type="text" id="customerName" placeholder="Tu nombre">
+            </div>
+            <div id="addressContainer" class="address-container" style="display: none;">
+                <span>Dirección</span>
+                <input type="text" id="customerAddress" placeholder="Tu dirección">
+            </div>
+            <div id="phoneContainer" class="phone-container" style="display: none;">
+                <span>Teléfono</span>
+                <input type="tel" id="customerPhone" placeholder="Tu teléfono">
+            </div>
+
+            <!-- Contenedor para el minimapa -->
+            <div id="locationContainer" class="location-container" style="display: none;">
+                <button id="getLocationButton" onclick="getLocation()">Compartir ubicación</button>
+                <span id="locationStatus">Ubicación no capturada</span>
+                <div id="miniMap" style="height: 200px; width: 100%; margin-top: 10px; display: none;"></div>
+            </div>
+
+
+            <!-- Tipo de pago -->
+            <div class="payment-type">
+                <label for="paymentType">Tipo de pago</label>
+                <select id="paymentType">
+                    <option value="" selected disabled>Selecciona el tipo de pago</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="transferencia">Transferencia</option>
+                </select>
+            </div>
+
+            <!-- Monto con el que se pagará -->
+            <div class="payment-amount" id="cashAmountSection" style="display: none;">
+                <label for="cashAmount">Monto con el que se pagará:</label>
+                <input type="number" id="cashAmount" placeholder="Ej. 50.00" min="0" step="0.01" oninput="calculateChange()">
+            </div>
+
+            <!-- Cambio a recibir -->
+            <div class="change-amount">
+                <label for="change">Cambio a recibir:</label>
+                <span id="changeAmount">L0.00</span>
+            </div>
+
+            <button class="submit-order-btn" onclick="submitOrder()">Enviar orden</button>
+        </div>
+    </div>
+
+    <!-- Botón Flotante del Carrito -->
+    <div id="floatingCart" class="floating-cart" onclick="toggleCartModal()">
+        <div class="cart-details">
+            <span id="cartItems">0 ARTÍCULO</span>
+            <span id="cartTotal">L0.00</span>
+        </div>
+        <span class="view-cart">Ver pedido ></span>
+    </div>
+
+    <!-- Tarjeta de Confirmación de Pedido -->
+    <div id="orderConfirmationCard" class="card" style="display: none;">
+        <button class="dismiss" type="button" onclick="closeOrderConfirmation()">×</button> 
+        <div class="header"> 
+            <div class="image">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 7L9.00004 18L3.99994 13" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+            </div> 
+            <div class="content">
+                <span class="title">Orden Enviada</span> 
+                <p class="message">¡Gracias por tu orden! pronto nos pondremos en contacto contigo..</p> 
+            </div> 
+        </div> 
+    </div>
+
+    <!-- Script para cargar los iconos -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => feather.replace());
+    </script>
+</body>
+</html>
