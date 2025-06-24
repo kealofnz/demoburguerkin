@@ -892,7 +892,7 @@ function submitOrder() {
 
         // Codificar el mensaje para la URL de WhatsApp
         const encodedMessage = encodeURIComponent(message);
-        const phoneNumber = "50497757736"; // Reemplaza con tu número de teléfono de WhatsApp
+        const phoneNumber = "50488644874"; // Reemplaza con tu número de teléfono de WhatsApp
         const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
 
         // Redirigir al usuario a WhatsApp
